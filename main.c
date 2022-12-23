@@ -19,7 +19,7 @@
 *
 ********************************************************************************************/
 
-#include "raylib.h"
+#include "C:\raylib\raylib\src\raylib.h"
 
 #if defined(PLATFORM_WEB)
     #include <emscripten/emscripten.h>
