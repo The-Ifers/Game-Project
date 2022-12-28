@@ -72,11 +72,12 @@ int main(void){
         // Representação
         ClearBackground((Color){ 0, 0, 0,255});
 
-            //Chão
-        DrawRectangle(chao.x, chao.y, chao.width, chao.height, (Color){255, 255, 255, 255});
         
             //Player
         DrawRectangle(player.hitbox.x, player.hitbox.y, player.hitbox.width, player.hitbox.height, (Color){150, 150, 150, 255});
+        
+            //Chão
+        DrawRectangle(chao.x, chao.y, chao.width, chao.height, (Color){255, 255, 255, 255});
 
             //Bordas
         DrawRectangle(Border1.x, Border1.y,Border1.width, Border1.height, (Color){5, 232, 65, 255});
