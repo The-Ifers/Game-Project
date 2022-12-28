@@ -11,6 +11,7 @@ typedef struct Player{
     int dirX;
     float speed;
     float boost;
+    float queda;
 
 }Player;
 
