@@ -9,10 +9,10 @@ typedef struct Player{
     Rectangle hitbox;
     int dirY;
     int dirX;
-    float speed;
+    float Yspeed;
+    float Xspeed;
     float boost;
-    float queda;
-
+    float airTime;
 }Player;
 
 
