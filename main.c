@@ -24,10 +24,11 @@ int main(void){
 
     //Player
     Player player;
-    player.Yspeed = 5;
-    player.Xspeed = 10;
-    player.boost = 0;
-    player.airTime = 0;
+    player.moves.Yspeed = 5;
+    player.moves.Xspeed = 10;
+    player.moves.boost = 0;
+    player.moves.airTime = 0;
+
     player.hitbox.width = 50;
     player.hitbox.height = 100;
     player.hitbox.y = chao.y - player.hitbox.height - 50;
@@ -43,61 +44,53 @@ int main(void){
     //------------------------------------------------</> Inicniando o Game-Loop </>------------------------------------------------//
     while (!WindowShouldClose())
     {
-        // Atualização
-        player.dirY = 0;
-        player.dirX = 0;
+        // Atualização de valores:
+        player.moves.dirY = 0;
+        player.moves.dirX = 0;
 
         if(CheckCollisionRecs(player.hitbox, chao)){
-            player.boost = initBoost;
-            player.airTime = 0;
+            player.moves.boost = initBoost;
+            player.moves.airTime = 0;
         }
         
-        
-
         // Movimentação (controles):
-
-        // Lados (A e D)
+        // Lados (A e D):
         if(IsKeyDown(KEY_A) && !CheckCollisionRecs(player.hitbox, Border1)){
-            player.dirX = -1;
+            player.moves.dirX = -1;
         }
         if(IsKeyDown(KEY_D) && !CheckCollisionRecs(player.hitbox, Border2)){
-            player.dirX = 1;
+            player.moves.dirX = 1;
         }
 
-        // Cima/Baixo (W e S)
+        // Cima/Baixo (W e S):
         if(IsKeyDown(KEY_S) && !CheckCollisionRecs(chao, player.hitbox)){
-            player.dirY = 1;
+            player.moves.dirY = 1;
         }
 
-        if(IsKeyDown(KEY_W) && player.boost!=0){
-            player.dirY = -1;
-            player.boost --;
-            player.airTime  = 0;
+        if(IsKeyDown(KEY_W) && player.moves.boost!=0){
+            player.moves.dirY = -1;
+            player.moves.boost --;
+            player.moves.airTime  = 0;
 
-        }else if(player.boost!=initBoost && IsKeyUp(KEY_W)){
-            player.boost = 0;
+        }else if(player.moves.boost!=initBoost && IsKeyUp(KEY_W)){
+            player.moves.boost = 0;
         }
 
-            // Gravidade: (com aceleração ainda XD)
+        // Gravidade: (com aceleração ainda XD)
         if(!CheckCollisionRecs(player.hitbox, chao)){
-            player.airTime++;
-            Gravity(&player.hitbox, player.Yspeed, player.airTime);
+            player.moves.airTime++;
+            Gravity(&player.hitbox, player.moves.Yspeed, player.moves.airTime);
         }else{
-            player.airTime = 0;
+            player.moves.airTime = 0;
             player.hitbox.y = chao.y - player.hitbox.height+1;
         }
 
-       
-        player.hitbox.x += player.dirX * player.Xspeed;
-        player.hitbox.y += player.dirY * player.Yspeed*5;
-
-          
-        
+        player.hitbox.x += player.moves.dirX * player.moves.Xspeed;
+        player.hitbox.y += player.moves.dirY * player.moves.Yspeed*5;
 
         // Representação
         ClearBackground((Color){ 0, 0, 0,255});
 
-            
             //Player
             DrawRectangle(player.hitbox.x, player.hitbox.y, player.hitbox.width, player.hitbox.height, (Color){150, 150, 150, 255});
             
@@ -105,13 +98,13 @@ int main(void){
             DrawRectangle(chao.x, chao.y, chao.width, chao.height, (Color){255, 255, 255, 255});
 
             //Bordas:
-            DrawRectangle(Border1.x, Border1.y,Border1.width, Border1.height, (Color){5, 232, 65, 255});
-            DrawRectangle(Border2.x, Border2.y,Border2.width, Border2.height, (Color){5, 232, 65, 255});
+            DrawRectangle(Border1.x, Border1.y,Border1.width, Border1.height, (Color){ 0, 0, 0,0});
+            DrawRectangle(Border2.x, Border2.y,Border2.width, Border2.height, (Color){ 0, 0, 0,0});
 
 
             // Debug:
             DrawText(TextFormat("Teste"), 10, 10, 20, WHITE);
-            DrawText(TextFormat("Boost: %.1f\nAirTime: %1.f", player.boost, player.airTime), screenWidth - 120, 10, 20, WHITE);
+            DrawText(TextFormat("Boost: %.1f\nAirTime: %1.f", player.moves.boost, player.moves.airTime), screenWidth - 120, 10, 20, WHITE);
         EndDrawing();
     }
 
