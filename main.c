@@ -3,115 +3,84 @@
 
 
 int main(void){
-    float screenWidth = 1280, screenHeight = 720;
+    srand(time(NULL));
+    //Cenário (Tela):
+    Playfield cenario;
+    cenario.screenWidth = 1280;
+    cenario.screenHeight = 720;
 
     //Chão
-    Rectangle chao;
-    chao.width = screenWidth;
-    chao.height = 100;
-    chao.y = screenHeight - chao.height;
-    chao.x = 0;
+    cenario.chao.width = cenario.screenWidth;
+    cenario.chao.height = 100;
+    cenario.chao.y = cenario.screenHeight - cenario.chao.height;
+    cenario.chao.x = 0;
 
     //Bordas
-    Rectangle Border1;
-    Border1.width = 1;
-    Border1.height = screenHeight;
-    Border1.y = 0;
+    cenario.Border1.width = 1;
+    cenario.Border1.height = cenario.screenHeight;
+    cenario.Border1.y = 0;
     
-    Rectangle Border2 = Border1;
-    Border1.x = 0;
-    Border2.x = screenWidth - Border2.width;
+    cenario.Border2 = cenario.Border1;
+    cenario.Border1.x = 0;
+    cenario.Border2.x = cenario.screenWidth - cenario.Border2.width;
 
-    //Player
+    //Player:
     Player player;
-    player.Yspeed = 5;
-    player.Xspeed = 10;
-    player.boost = 0;
-    player.airTime = 0;
+    player.moves.Yspeed = 5;
+    player.moves.Xspeed = 15;
+    player.moves.boost = 0;
+    player.moves.airTime = 0;
+
     player.hitbox.width = 50;
     player.hitbox.height = 100;
-    player.hitbox.y = chao.y - player.hitbox.height - 50;
-    player.hitbox.x = screenWidth/2 - player.hitbox.width/2;
+    player.hitbox.y = cenario.chao.y - player.hitbox.height - 50;
+    player.hitbox.x = cenario.screenWidth/2 - player.hitbox.width/2;
+
+    //Inimigo (debug):
+    Inimigo inimigo[10];
+    for(int I=0; I<10; I++){
+        inimigo[I] = startEnemy((int)cenario.screenHeight, (int)cenario.screenWidth);
+    }
 
 
-    //TestVars:
-    float initBoost = 10;
-
-    InitWindow(screenWidth, screenHeight, "Teste");
+    InitWindow(cenario.screenWidth, cenario.screenHeight, "Teste");
     SetTargetFPS(60);
 
     //------------------------------------------------</> Inicniando o Game-Loop </>------------------------------------------------//
-    while (!WindowShouldClose())
-    {
-        // Atualização
-        player.dirY = 0;
-        player.dirX = 0;
+    while (!WindowShouldClose()){   
 
-        if(CheckCollisionRecs(player.hitbox, chao)){
-            player.boost = initBoost;
-            player.airTime = 0;
+        // --- Movimentação do player ---
+        playerMoves(&player, cenario);
+
+
+        // --- Movimentação do inimigo ---
+        for(int I=0; I<10; I++){
+        inimigo[I] = enemyMoves(inimigo[I], player);
         }
         
-        
 
-        // Movimentação (controles):
-
-        // Lados (A e D)
-        if(IsKeyDown(KEY_A) && !CheckCollisionRecs(player.hitbox, Border1)){
-            player.dirX = -1;
-        }
-        if(IsKeyDown(KEY_D) && !CheckCollisionRecs(player.hitbox, Border2)){
-            player.dirX = 1;
-        }
-
-        // Cima/Baixo (W e S)
-        if(IsKeyDown(KEY_S) && !CheckCollisionRecs(chao, player.hitbox)){
-            player.dirY = 1;
-        }
-
-        if(IsKeyDown(KEY_W) && player.boost!=0){
-            player.dirY = -1;
-            player.boost --;
-            player.airTime  = 0;
-
-        }else if(player.boost!=initBoost && IsKeyUp(KEY_W)){
-            player.boost = 0;
-        }
-
-            // Gravidade: (com aceleração ainda XD)
-        if(!CheckCollisionRecs(player.hitbox, chao)){
-            player.airTime++;
-            Gravity(&player.hitbox, player.Yspeed, player.airTime);
-        }else{
-            player.airTime = 0;
-            player.hitbox.y = chao.y - player.hitbox.height+1;
-        }
-
-       
-        player.hitbox.x += player.dirX * player.Xspeed;
-        player.hitbox.y += player.dirY * player.Yspeed*5;
-
-          
-        
 
         // Representação
         ClearBackground((Color){ 0, 0, 0,255});
 
-            
-            //Player
+            // Player
             DrawRectangle(player.hitbox.x, player.hitbox.y, player.hitbox.width, player.hitbox.height, (Color){150, 150, 150, 255});
             
-            //Chão
-            DrawRectangle(chao.x, chao.y, chao.width, chao.height, (Color){255, 255, 255, 255});
+            // Inimigo (teste)
+            for(int I=0; I<10; I++){
+                DrawRectangle(inimigo[I].hitbox.x, inimigo[I].hitbox.y, inimigo[I].hitbox.width, inimigo[I].hitbox.height, inimigo[I].cor);
+            }
+            
+            // Chão
+            DrawRectangle(cenario.chao.x, cenario.chao.y, cenario.chao.width, cenario.chao.height, (Color){255, 255, 255, 255});
 
-            //Bordas:
-            DrawRectangle(Border1.x, Border1.y,Border1.width, Border1.height, (Color){5, 232, 65, 255});
-            DrawRectangle(Border2.x, Border2.y,Border2.width, Border2.height, (Color){5, 232, 65, 255});
-
+            // Bordas:
+            DrawRectangle(cenario.Border1.x, cenario.Border1.y, cenario.Border1.width, cenario.Border1.height, (Color){ 0, 0, 0,0});
+            DrawRectangle(cenario.Border2.x, cenario.Border2.y, cenario.Border2.width, cenario.Border2.height, (Color){ 0, 0, 0,0});
 
             // Debug:
             DrawText(TextFormat("Teste"), 10, 10, 20, WHITE);
-            DrawText(TextFormat("Boost: %.1f\nAirTime: %1.f", player.boost, player.airTime), screenWidth - 120, 10, 20, WHITE);
+            DrawText(TextFormat("Boost: %.1f\nAirTime: %1.f\n\nPlayer (x|y): (X = %.1f) (Y = %.1f)\n", player.moves.boost, player.moves.airTime, player.hitbox.x, player.hitbox.y), 10, 30, 10, WHITE);
         EndDrawing();
     }
 
