@@ -4,6 +4,14 @@
 #include <locale.h>
 #include "C:\raylib\raylib\src\raylib.h"
 
+typedef struct Playfield{
+    float screenWidth;
+    float screenHeight;
+    Rectangle chao;
+    Rectangle Border1;
+    Rectangle Border2;
+}Playfield;
+
 typedef struct Movimentation{
     int dirY;
     int dirX;
@@ -19,3 +27,9 @@ typedef struct Player{
 }Player;
 
 
+typedef struct Inimigo{
+    Rectangle hitbox;
+    Movimentation moves;
+
+    Color cor; // só para debug.
+}Inimigo;
