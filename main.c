@@ -55,7 +55,7 @@ int main(void){
 
         // --- Movimentação do inimigo ---
         for(int I=0; I<10; I++){
-        inimigo[I] = enemyMoves(inimigo[I], player);
+            inimigo[I] = enemyMoves(inimigo[I], player.hitbox.x+player.hitbox.width/2, player.hitbox.y+player.hitbox.height/2);
         }
         
 
@@ -65,7 +65,7 @@ int main(void){
 
             // Player
             DrawRectangle(player.hitbox.x, player.hitbox.y, player.hitbox.width, player.hitbox.height, (Color){150, 150, 150, 255});
-            
+            /* DrawCircle(player.hitbox.x, player.hitbox.y, 50, WHITE); */
             // Inimigo (teste)
             for(int I=0; I<10; I++){
                 DrawRectangle(inimigo[I].hitbox.x, inimigo[I].hitbox.y, inimigo[I].hitbox.width, inimigo[I].hitbox.height, inimigo[I].cor);
@@ -73,7 +73,7 @@ int main(void){
             
             // Chão
             DrawRectangle(cenario.chao.x, cenario.chao.y, cenario.chao.width, cenario.chao.height, (Color){255, 255, 255, 255});
-
+            
             // Bordas:
             DrawRectangle(cenario.Border1.x, cenario.Border1.y, cenario.Border1.width, cenario.Border1.height, (Color){ 0, 0, 0,0});
             DrawRectangle(cenario.Border2.x, cenario.Border2.y, cenario.Border2.width, cenario.Border2.height, (Color){ 0, 0, 0,0});

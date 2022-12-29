@@ -4,8 +4,8 @@ Inimigo startEnemy(int Y, int X){
     Inimigo newEnemy;
     int posX;
     int posY;
-    newEnemy.moves.Yspeed = rand()%10;
-    newEnemy.moves.Xspeed = rand()%10;
+    newEnemy.moves.Yspeed = 1+(rand()%10);
+    newEnemy.moves.Xspeed = 1+(rand()%10);
     newEnemy.moves.boost = 0;
     newEnemy.moves.airTime = 0;
     
@@ -26,9 +26,6 @@ Inimigo startEnemy(int Y, int X){
 
     return newEnemy;
 }
-
-
-
 
 void Gravity(Rectangle *hitbox, float g, float a){
     hitbox->y += g + (a*a)/2;
@@ -59,7 +56,7 @@ void playerMoves(Player *player, Playfield cenario){
         player->moves.dirY = 1;
     }
 
-    if(IsKeyDown(KEY_W) && player->moves.boost!=0){
+    if((IsKeyDown(KEY_W) || IsKeyDown(KEY_SPACE)) && player->moves.boost!=0){
         player->moves.dirY = -1;
         player->moves.boost --;
         player->moves.airTime  = 0;
@@ -80,26 +77,24 @@ void playerMoves(Player *player, Playfield cenario){
 }
 
 
-Inimigo enemyMoves(Inimigo seeker, Player target){
+Inimigo enemyMoves(Inimigo seeker, float posX, float posY){
     seeker.moves.dirX = 0;
     seeker.moves.dirY = 0;
 
     // X moves
-    if(seeker.hitbox.x+seeker.hitbox.width/2>target.hitbox.x+target.hitbox.width/2){
+    if(seeker.hitbox.x+seeker.hitbox.width/2>posX+10){
         seeker.moves.dirX = -1;
-    }else if(seeker.hitbox.x+seeker.hitbox.width/2<target.hitbox.x+target.hitbox.width/2){
+    }else if(seeker.hitbox.x+seeker.hitbox.width/2<posX-10){
         seeker.moves.dirX = 1;
     }
     seeker.hitbox.x += seeker.moves.dirX * seeker.moves.Xspeed;
 
     
     // Y moves
-    if(seeker.hitbox.y>=target.hitbox.y && seeker.hitbox.y<=target.hitbox.y+target.hitbox.height){
-        seeker.moves.dirY = 0;
-    }else if(seeker.hitbox.y+seeker.hitbox.height/2<target.hitbox.y+target.hitbox.height/2){
-        seeker.moves.dirY = 1;
-    }else{
+    if(seeker.hitbox.y+seeker.hitbox.height/2>posY+10){
         seeker.moves.dirY = -1;
+    }else if(seeker.hitbox.y+seeker.hitbox.height/2<posY-10){
+        seeker.moves.dirY = 1;
     }
     seeker.hitbox.y += seeker.moves.dirY * seeker.moves.Yspeed;
 
