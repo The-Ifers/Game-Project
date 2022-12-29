@@ -40,7 +40,7 @@ void playerMoves(Player *player, Playfield cenario){
     player->moves.dirX = 0;
 
     if(CheckCollisionRecs(player->hitbox, cenario.chao)){
-        player->moves.boost = 15;
+        player->moves.boost = 10;
         player->moves.airTime = 0;
     }
     
@@ -64,7 +64,7 @@ void playerMoves(Player *player, Playfield cenario){
         player->moves.boost --;
         player->moves.airTime  = 0;
 
-    }else if(player->moves.boost!=15 && IsKeyUp(KEY_W)){
+    }else if(player->moves.boost!=10 && IsKeyUp(KEY_W)){
         player->moves.boost = 0;
     }
 
