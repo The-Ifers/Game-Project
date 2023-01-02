@@ -4,46 +4,22 @@
 
 int main(void){
     srand(time(NULL));
+    
     //Cenário (Tela):
     Playfield cenario;
-    cenario.screenWidth = 1280;
-    cenario.screenHeight = 720;
-
-    //Chão
-    cenario.chao.width = cenario.screenWidth;
-    cenario.chao.height = 100;
-    cenario.chao.y = cenario.screenHeight - cenario.chao.height;
-    cenario.chao.x = 0;
-
-    //Bordas
-    cenario.Border1.width = 1;
-    cenario.Border1.height = cenario.screenHeight;
-    cenario.Border1.y = 0;
+    startPlayField(&cenario, 1280, 720, 1280, 100, 0, 620);
     
-    cenario.Border2 = cenario.Border1;
-    cenario.Border1.x = 0;
-    cenario.Border2.x = cenario.screenWidth - cenario.Border2.width;
-
     //Player:
     Player player;
-    player.moves.Yspeed = 5;
-    player.moves.Xspeed = 15;
-    player.moves.boost = 0;
-    player.moves.airTime = 0;
-
-    player.hitbox.width = 50;
-    player.hitbox.height = 100;
-    player.hitbox.y = cenario.chao.y - player.hitbox.height - 50;
-    player.hitbox.x = cenario.screenWidth/2 - player.hitbox.width/2;
+    startPlayer(&player, 100, 50, (cenario.screenWidth/2-25), (cenario.chao.y - 50), 10, 5);
 
     //Inimigo (debug):
     Inimigo inimigo[10];
     for(int I=0; I<10; I++){
-        inimigo[I] = startEnemy((int)cenario.screenHeight, (int)cenario.screenWidth);
+        startEnemy(&inimigo[I], 50, 50, (rand()%(int)cenario.screenWidth), -55, (rand()%9)+1, (rand()%9)+1);
     }
 
-
-    InitWindow(cenario.screenWidth, cenario.screenHeight, "Teste");
+    InitWindow(cenario.screenWidth, cenario.screenHeight, "PlayField game test.");
     SetTargetFPS(60);
 
     //------------------------------------------------</> Inicniando o Game-Loop </>------------------------------------------------//
@@ -55,18 +31,16 @@ int main(void){
 
         // --- Movimentação do inimigo ---
         for(int I=0; I<10; I++){
-            inimigo[I] = enemyMoves(inimigo[I], player.hitbox.x+player.hitbox.width/2, player.hitbox.y+player.hitbox.height/2);
+            enemyMoves(&inimigo[I], player.hitbox.x+player.hitbox.width/2, player.hitbox.y+player.hitbox.height/2);
         }
-        
-
 
         // Representação
         ClearBackground((Color){ 0, 0, 0,255});
 
             // Player
             DrawRectangle(player.hitbox.x, player.hitbox.y, player.hitbox.width, player.hitbox.height, (Color){150, 150, 150, 255});
-            /* DrawCircle(player.hitbox.x, player.hitbox.y, 50, WHITE); */
-            // Inimigo (teste)
+            
+            // Inimigo (debug)
             for(int I=0; I<10; I++){
                 DrawRectangle(inimigo[I].hitbox.x, inimigo[I].hitbox.y, inimigo[I].hitbox.width, inimigo[I].hitbox.height, inimigo[I].cor);
             }
@@ -74,13 +48,8 @@ int main(void){
             // Chão
             DrawRectangle(cenario.chao.x, cenario.chao.y, cenario.chao.width, cenario.chao.height, (Color){255, 255, 255, 255});
             
-            // Bordas:
-            DrawRectangle(cenario.Border1.x, cenario.Border1.y, cenario.Border1.width, cenario.Border1.height, (Color){ 0, 0, 0,0});
-            DrawRectangle(cenario.Border2.x, cenario.Border2.y, cenario.Border2.width, cenario.Border2.height, (Color){ 0, 0, 0,0});
-
             // Debug:
-            DrawText(TextFormat("Teste"), 10, 10, 20, WHITE);
-            DrawText(TextFormat("Boost: %.1f\nAirTime: %1.f\n\nPlayer (x|y): (X = %.1f) (Y = %.1f)\n", player.moves.boost, player.moves.airTime, player.hitbox.x, player.hitbox.y), 10, 30, 10, WHITE);
+            DrawText(TextFormat("Jump Timer: %.1f\nAirTime: %1.f\n\nPlayer (x|y): (X = %.1f) (Y = %.1f)\n", player.jumpTimer, player.airTime, player.hitbox.x, player.hitbox.y), 5, 10, 15, WHITE);
         EndDrawing();
     }
 

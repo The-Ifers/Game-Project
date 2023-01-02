@@ -1,102 +1,134 @@
 #include "structs.c"
 
-Inimigo startEnemy(int Y, int X){
-    Inimigo newEnemy;
-    int posX;
-    int posY;
-    newEnemy.moves.Yspeed = 1+(rand()%10);
-    newEnemy.moves.Xspeed = 1+(rand()%10);
-    newEnemy.moves.boost = 0;
-    newEnemy.moves.airTime = 0;
+
+// Iniciando objetos (player, inimigo, armas, etc.):
+// Player:
+void startPlayer(Player *player, float height, float width, float posX, float posY, float speedX, float speedY){
+    player->hitbox.height = height;
+    player->hitbox.width = width;
+    player->hitbox.x = posX;
+    player->hitbox.y = posY;
+
+    player->moves.dirX = 0;
+    player->moves.dirY =0;
+    player->moves.Xspeed = speedX;
+    player->moves.Yspeed = speedY;
+
+    player->jumpTimer = 0;
+    player->airTime = 0;
+}
+
+// Inimigos:
+void startEnemy(Inimigo *enemy, float height, float width, float posX, float posY, float speedX, float speedY){
+    enemy->hitbox.height = height;
+    enemy->hitbox.width = width;
+    enemy->hitbox.x = posX;
+    enemy->hitbox.y = posY;
     
-    newEnemy.hitbox.width = 50;
-    newEnemy.hitbox.height = 50;
-    
-    posX = -(rand()%10);
-    if(posX%2==0){
-        newEnemy.hitbox.x=-60;
+    enemy->moves.Xspeed = speedX;
+    enemy->moves.Yspeed = speedY;
+    enemy->moves.dirX = 0;
+    enemy->moves.dirY = 0;
+
+    enemy->cor = (Color){(rand() % 255), (rand() % 255), (rand() % 255), 255};
+}
+
+
+// PlayField:
+void startPlayField(Playfield *playfield, float Width, float Height, float floorWidth, float floorHeight, float floorX, float floorY){
+    playfield->screenWidth = Width;
+    playfield->screenHeight = Height;
+
+    playfield->chao.width = floorWidth;
+    playfield->chao.height = floorHeight;
+    playfield->chao.x = floorX;
+    playfield->chao.y = floorY;
+
+    playfield->Border1.width = 1;
+    playfield->Border1.height = Height;
+    playfield->Border1.y = 0;
+
+    playfield->Border2 = playfield->Border1;
+    playfield->Border1.x = 0;
+    playfield->Border2.x = Width-playfield->Border2.width;
+}
+
+
+
+// Movimentação (Player, Inimigo, etc);
+void Gravity(Rectangle *hitbox, Rectangle collider, float gForce, float *acceleration){
+    if(!CheckCollisionRecs(*hitbox, collider) && !(hitbox->y>collider.y+5)){
+        *acceleration = *acceleration + 1;
+        hitbox->y += gForce + (*acceleration**acceleration)/2;
     }else{
-        newEnemy.hitbox.x = X+60;
+        acceleration = 0;
+        hitbox->y = collider.y - hitbox->height+1;
     }
-
-    posY = -(rand()% (Y - 200));
-    newEnemy.hitbox.y = (float)posY;
-
-    newEnemy.cor = (Color){(rand()%255),(rand()%255),(rand()%255), 255};
-
-    return newEnemy;
 }
 
-void Gravity(Rectangle *hitbox, float g, float a){
-    hitbox->y += g + (a*a)/2;
-}
+
+
+/* Gravity(&player->hitbox, cenario.chao, player->moves.Yspeed, player->airTime); */
+
 
 void playerMoves(Player *player, Playfield cenario){
-    // Atualização de valores:
+
+    // Reset da direção do player:
     player->moves.dirY = 0;
     player->moves.dirX = 0;
 
+    // Testando colisão para resetar o pulo:
     if(CheckCollisionRecs(player->hitbox, cenario.chao)){
-        player->moves.boost = 10;
-        player->moves.airTime = 0;
+        player->airTime = 0;
+    }
+    if(player->jumpTimer>0){
+        player->jumpTimer--;
     }
     
     // Movimentação (controles):
-    // Lados (A e D):
-    if(IsKeyDown(KEY_A) && !CheckCollisionRecs(player->hitbox, cenario.Border1)){
-        player->moves.dirX = -1;
-    }
-    if(IsKeyDown(KEY_D) && !CheckCollisionRecs(player->hitbox, cenario.Border2)){
-        player->moves.dirX = 1;
-    }
-    player->hitbox.x += player->moves.dirX * player->moves.Xspeed;
+    // Key A: (Esquerda):
+    if(IsKeyDown(KEY_A) && !CheckCollisionRecs(player->hitbox, cenario.Border1)) player->moves.dirX = -1;
+    
+    // Key D: (Direita):
+    if(IsKeyDown(KEY_D) && !CheckCollisionRecs(player->hitbox, cenario.Border2)) player->moves.dirX = 1;
 
-    // Cima/Baixo (W e S):
-    if(IsKeyDown(KEY_S) && !CheckCollisionRecs(cenario.chao, player->hitbox)){
-        player->moves.dirY = 1;
-    }
+    // Key S: (Baixo): (debug)
+    if(IsKeyDown(KEY_S) && !CheckCollisionRecs(cenario.chao, player->hitbox)) player->moves.dirY = 1;
 
-    if((IsKeyDown(KEY_W) || IsKeyDown(KEY_SPACE)) && player->moves.boost!=0){
+    // Key S: (Cima/Pulo): 
+    if(((IsKeyDown(KEY_W) || IsKeyDown(KEY_SPACE))  && player->jumpTimer==0) || player->airTime!=0){
+        if(CheckCollisionRecs(player->hitbox, cenario.chao)){
+            player->jumpTimer = 30;
+        }
         player->moves.dirY = -1;
-        player->moves.boost --;
-        player->moves.airTime  = 0;
-
-    }else if(player->moves.boost!=10 && IsKeyUp(KEY_W)){
-        player->moves.boost = 0;
     }
-
-    // Gravidade: (com aceleração ainda XD)
-    if(!CheckCollisionRecs(player->hitbox, cenario.chao)){
-        player->moves.airTime++;
-        Gravity(&player->hitbox, player->moves.Yspeed, player->moves.airTime);
-    }else{
-        player->moves.airTime = 0;
-        player->hitbox.y = cenario.chao.y - player->hitbox.height+1;
-    }
-    player->hitbox.y += player->moves.dirY * player->moves.Yspeed*5;
-}
-
-
-Inimigo enemyMoves(Inimigo seeker, float posX, float posY){
-    seeker.moves.dirX = 0;
-    seeker.moves.dirY = 0;
-
-    // X moves
-    if(seeker.hitbox.x+seeker.hitbox.width/2>posX+10){
-        seeker.moves.dirX = -1;
-    }else if(seeker.hitbox.x+seeker.hitbox.width/2<posX-10){
-        seeker.moves.dirX = 1;
-    }
-    seeker.hitbox.x += seeker.moves.dirX * seeker.moves.Xspeed;
 
     
-    // Y moves
-    if(seeker.hitbox.y+seeker.hitbox.height/2>posY+10){
-        seeker.moves.dirY = -1;
-    }else if(seeker.hitbox.y+seeker.hitbox.height/2<posY-10){
-        seeker.moves.dirY = 1;
-    }
-    seeker.hitbox.y += seeker.moves.dirY * seeker.moves.Yspeed;
+    player->hitbox.x += player->moves.dirX * player->moves.Xspeed;
+    player->hitbox.y += player->moves.dirY * player->moves.Yspeed*10;
 
-    return seeker;
+    Gravity(&player->hitbox, cenario.chao, player->moves.Yspeed, &player->airTime);
+}
+
+// Movimentos do inimigo:
+// Inimigo Voador
+void enemyMoves(Inimigo *seeker, float posX, float posY){
+    seeker->moves.dirX = 0;
+    seeker->moves.dirY = 0;
+
+    // X moves
+    if(seeker->hitbox.x+seeker->hitbox.width/2>posX+5){
+        seeker->moves.dirX = -1;
+    }else if(seeker->hitbox.x+seeker->hitbox.width/2<posX-5){
+        seeker->moves.dirX = 1;
+    }
+    seeker->hitbox.x += seeker->moves.dirX * seeker->moves.Xspeed;
+
+    // Y moves
+    if(seeker->hitbox.y+seeker->hitbox.height/2>posY+5){
+        seeker->moves.dirY = -1;
+    }else if(seeker->hitbox.y+seeker->hitbox.height/2<posY-5){
+        seeker->moves.dirY = 1;
+    }
+    seeker->hitbox.y += seeker->moves.dirY * seeker->moves.Yspeed;
 }

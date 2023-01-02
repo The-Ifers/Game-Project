@@ -17,13 +17,13 @@ typedef struct Movimentation{
     int dirX;
     float Yspeed;
     float Xspeed;
-    float boost;
-    float airTime;
 }Movimentation;
 
 typedef struct Player{
     Rectangle hitbox;
     Movimentation moves;
+    float jumpTimer;
+    float airTime;
 }Player;
 
 
