@@ -1,6 +1,7 @@
 #include "C:\raylib\raylib\src\raylib.h"
 #include "resources/code/functions.c"
 
+bool pause_game = false;
 
 int main(void){
     srand(time(NULL));
@@ -13,7 +14,7 @@ int main(void){
     Player player;
     startPlayer(&player, 100, 50, (cenario.screenWidth/2-25), (cenario.chao.y - 50), 10, 5);
 
-    //Inimigo (debug):
+    //Inimigo (debug): 
     Inimigo inimigo[10];
     for(int I=0; I<10; I++){
         startEnemy(&inimigo[I], 50, 50, (rand()%(int)cenario.screenWidth), -55, (rand()%9)+1, (rand()%9)+1);
@@ -25,13 +26,20 @@ int main(void){
     //------------------------------------------------</> Inicniando o Game-Loop </>------------------------------------------------//
     while (!WindowShouldClose()){   
 
-        // --- Movimentação do player ---
-        playerMoves(&player, cenario);
+        // --- Testa se o jogo está pausado ---
+        if(IsKeyPressed(KEY_TAB)) pause_game = !pause_game;
+        
+        // Caso não esteja pausado, executa a rotina normal
+        if(!pause_game){
+
+            // --- Movimentação do player ---
+            playerMoves(&player, cenario);
 
 
-        // --- Movimentação do inimigo ---
-        for(int I=0; I<10; I++){
-            enemyMoves(&inimigo[I], player.hitbox.x+player.hitbox.width/2, player.hitbox.y+player.hitbox.height/2);
+            // --- Movimentação do inimigo ---
+            for(int I=0; I<10; I++){
+                enemyMoves(&inimigo[I], player.hitbox.x+player.hitbox.width/2, player.hitbox.y+player.hitbox.height/2);
+            }
         }
 
         // Representação
@@ -48,6 +56,11 @@ int main(void){
             // Chão
             DrawRectangle(cenario.chao.x, cenario.chao.y, cenario.chao.width, cenario.chao.height, (Color){255, 255, 255, 255});
             
+            // Pause Screen
+            DrawText("Press TAB to pause", 10, 700, 15, BLACK);
+            if(pause_game)
+                DrawText("THE GAME IS PAUSED!", 1000/2, 670, 30, GREEN);
+
             // Debug:
             DrawText(TextFormat("Jump Timer: %.1f\nAirTime: %1.f\n\nPlayer (x|y): (X = %.1f) (Y = %.1f)\n", player.jumpTimer, player.airTime, player.hitbox.x, player.hitbox.y), 5, 10, 15, WHITE);
         EndDrawing();
