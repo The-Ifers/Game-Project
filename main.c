@@ -2,6 +2,7 @@
 #include "resources/code/functions.c"
 
 bool pause_game = false;
+bool game_menu = true;
 
 int main(void){
     srand(time(NULL));
@@ -32,9 +33,18 @@ int main(void){
     //------------------------------------------------</> Inicniando o Game-Loop </>------------------------------------------------//
     while (!WindowShouldClose()){   
 
+        // --- Tela Inicial ---
+        if(game_menu){
+            if(!initial_screen(cenario)) break;
+            game_menu = !game_menu;
+        }
+
         // --- Testa se o jogo está pausado ---
         if(IsKeyPressed(KEY_TAB)) pause_game = !pause_game;
         
+        // --- Retornar tela inicial ---
+        if(IsKeyPressed(KEY_X) && pause_game) game_menu = !game_menu;
+
         // Caso não esteja pausado, executa a rotina normal
         if(!pause_game){
             //(TESTE): rodando textura (frames):
@@ -71,8 +81,11 @@ int main(void){
             
             // Pause Screen
             DrawText("Press TAB to pause", 10, 700, 15, BLACK);
-            if(pause_game)
+            if(pause_game){
                 DrawText("THE GAME IS PAUSED!", cenario.screenWidth/2-190, 660, 30, GREEN);
+                DrawText("X -> Go to menu", cenario.screenWidth/2+190, 660, 15, GREEN);
+                DrawText("ESC -> Close Game", cenario.screenWidth/2+190, 690, 15, GREEN);
+            }
 
             // Debug:
             DrawText(TextFormat("Jump Timer: %.1f\nAirTime: %1.f\n\nPlayer (x|y): (X = %.1f) (Y = %.1f)\n", player.jumpTimer, player.airTime, player.hitbox.x, player.hitbox.y), 5, 10, 15, WHITE);
