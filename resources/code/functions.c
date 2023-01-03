@@ -121,3 +121,21 @@ void enemyMoves(Inimigo *seeker, float posX, float posY){
     }
     seeker->hitbox.y += seeker->moves.dirY * seeker->moves.Yspeed;
 }
+
+int initial_screen(Playfield cenario){
+    while (!WindowShouldClose()){
+        // --- Iniciar o Jogo
+        if(IsKeyPressed(KEY_ENTER))
+            return 1;
+
+        //Tela Inicial Representação
+        ClearBackground((Color){ 0, 0, 0,255});
+        {
+            DrawRectangle(cenario.screenWidth/2-150, cenario.screenHeight/2, 300, 70, PURPLE);
+            DrawText("ENTER TO PLAY", cenario.screenWidth/2-130, cenario.screenHeight/2+20, 30, WHITE);
+        }
+        EndDrawing();
+    }
+    // --- Fechar o Jogo
+    return 0;
+}
