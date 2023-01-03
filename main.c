@@ -11,8 +11,10 @@ int main(void){
     startPlayField(&cenario, 1280, 720, 1280, 100, 0, 620);
     
     //Player:
-    Player player;
+    Player player, player2;
     startPlayer(&player, 100, 50, (cenario.screenWidth/2-25), (cenario.chao.y - 50), 10, 5);
+
+    startPlayer(&player2, 60, 65, 100, 555, 10, 5);
 
     //Inimigo (debug): 
     //Inimigo (debug):
@@ -45,19 +47,19 @@ int main(void){
             frameCounter = frameCounter % maxFrames;
 
             // --- Movimentação do player ---
-            playerMoves(&player, cenario);
-
+            playerMoves(&player, cenario, KEY_W, KEY_S, KEY_A, KEY_D);
+            playerMoves(&player2, cenario, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT);
 
             // --- Movimentação do inimigo ---
             enemyMoves(&inimigo, player.hitbox.x+player.hitbox.width/2, player.hitbox.y+player.hitbox.height/2);
-            
         }
 
         // Representação
         ClearBackground((Color){ 0, 0, 0,255});
 
             // Player
-            DrawRectangle(player.hitbox.x, player.hitbox.y, player.hitbox.width, player.hitbox.height, (Color){150, 150, 150, 255});
+            DrawRectangle(player.hitbox.x, player.hitbox.y, player.hitbox.width, player.hitbox.height, (Color){255, 150, 150, 255});
+            DrawRectangle(player2.hitbox.x, player2.hitbox.y, player2.hitbox.width, player2.hitbox.height, (Color){150, 150, 255, 255});
             
             // Inimigo (debug)
             DrawRectangle(inimigo.hitbox.x, inimigo.hitbox.y, inimigo.hitbox.width, inimigo.hitbox.height, inimigo.cor);
@@ -69,7 +71,7 @@ int main(void){
             // Pause Screen
             DrawText("Press TAB to pause", 10, 700, 15, BLACK);
             if(pause_game)
-                DrawText("THE GAME IS PAUSED!", cenario.screenWidth/2, 670, 30, GREEN);
+                DrawText("THE GAME IS PAUSED!", cenario.screenWidth/2-190, 660, 30, GREEN);
 
             // Debug:
             DrawText(TextFormat("Jump Timer: %.1f\nAirTime: %1.f\n\nPlayer (x|y): (X = %.1f) (Y = %.1f)\n", player.jumpTimer, player.airTime, player.hitbox.x, player.hitbox.y), 5, 10, 15, WHITE);

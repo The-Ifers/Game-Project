@@ -33,7 +33,6 @@ void startEnemy(Inimigo *enemy, float height, float width, float posX, float pos
     enemy->cor = (Color){(rand() % 255), (rand() % 255), (rand() % 255), 255};
 }
 
-
 // PlayField:
 void startPlayField(Playfield *playfield, float Width, float Height, float floorWidth, float floorHeight, float floorX, float floorY){
     playfield->screenWidth = Width;
@@ -54,8 +53,8 @@ void startPlayField(Playfield *playfield, float Width, float Height, float floor
 }
 
 
-
 // Movimentação (Player, Inimigo, etc);
+
 void Gravity(Rectangle *hitbox, Rectangle collider, float gForce, float *acceleration){
     if(!CheckCollisionRecs(*hitbox, collider) && !(hitbox->y>collider.y+5)){
         *acceleration = *acceleration + 1;
@@ -66,12 +65,7 @@ void Gravity(Rectangle *hitbox, Rectangle collider, float gForce, float *acceler
     }
 }
 
-
-
-/* Gravity(&player->hitbox, cenario.chao, player->moves.Yspeed, player->airTime); */
-
-
-void playerMoves(Player *player, Playfield cenario){
+void playerMoves(Player *player, Playfield cenario, KeyboardKey up, KeyboardKey down, KeyboardKey left, KeyboardKey right){
 
     // Reset da direção do player:
     player->moves.dirY = 0;
@@ -87,22 +81,21 @@ void playerMoves(Player *player, Playfield cenario){
     
     // Movimentação (controles):
     // Key A: (Esquerda):
-    if(IsKeyDown(KEY_A) && !CheckCollisionRecs(player->hitbox, cenario.Border1)) player->moves.dirX = -1;
+    if(IsKeyDown(left) && !CheckCollisionRecs(player->hitbox, cenario.Border1)) player->moves.dirX = -1;
     
     // Key D: (Direita):
-    if(IsKeyDown(KEY_D) && !CheckCollisionRecs(player->hitbox, cenario.Border2)) player->moves.dirX = 1;
+    if(IsKeyDown(right) && !CheckCollisionRecs(player->hitbox, cenario.Border2)) player->moves.dirX = 1;
 
     // Key S: (Baixo): (debug)
-    if(IsKeyDown(KEY_S) && !CheckCollisionRecs(cenario.chao, player->hitbox)) player->moves.dirY = 1;
+    if(IsKeyDown(down) && !CheckCollisionRecs(cenario.chao, player->hitbox)) player->moves.dirY = 1;
 
     // Key S: (Cima/Pulo): 
-    if(((IsKeyDown(KEY_W) || IsKeyDown(KEY_SPACE))  && player->jumpTimer==0) || player->airTime!=0){
+    if((IsKeyDown(up)  && player->jumpTimer==0) || player->airTime!=0){
         if(CheckCollisionRecs(player->hitbox, cenario.chao)){
             player->jumpTimer = 30;
         }
         player->moves.dirY = -1;
     }
-
     
     player->hitbox.x += player->moves.dirX * player->moves.Xspeed;
     player->hitbox.y += player->moves.dirY * player->moves.Yspeed*10;
