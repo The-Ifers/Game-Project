@@ -56,6 +56,7 @@ int main(void){
 
         // Representação
         ClearBackground((Color){ 0, 0, 0,255});
+        {
 
             // Player
             DrawRectangle(player.hitbox.x, player.hitbox.y, player.hitbox.width, player.hitbox.height, (Color){255, 150, 150, 255});
@@ -75,6 +76,7 @@ int main(void){
 
             // Debug:
             DrawText(TextFormat("Jump Timer: %.1f\nAirTime: %1.f\n\nPlayer (x|y): (X = %.1f) (Y = %.1f)\n", player.jumpTimer, player.airTime, player.hitbox.x, player.hitbox.y), 5, 10, 15, WHITE);
+        }
         EndDrawing();
     }
 

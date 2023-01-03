@@ -72,12 +72,10 @@ void playerMoves(Player *player, Playfield cenario, KeyboardKey up, KeyboardKey 
     player->moves.dirX = 0;
 
     // Testando colisão para resetar o pulo:
-    if(CheckCollisionRecs(player->hitbox, cenario.chao)){
-        player->airTime = 0;
-    }
-    if(player->jumpTimer>0){
-        player->jumpTimer--;
-    }
+    if(CheckCollisionRecs(player->hitbox, cenario.chao)) player->airTime = 0;
+
+    // Decrementando o timer para o próximo pulo (caso ele seja maior que zero):
+    if(player->jumpTimer>0) player->jumpTimer--;
     
     // Movimentação (controles):
     // Key A: (Esquerda):
@@ -91,9 +89,7 @@ void playerMoves(Player *player, Playfield cenario, KeyboardKey up, KeyboardKey 
 
     // Key S: (Cima/Pulo): 
     if((IsKeyDown(up)  && player->jumpTimer==0) || player->airTime!=0){
-        if(CheckCollisionRecs(player->hitbox, cenario.chao)){
-            player->jumpTimer = 30;
-        }
+        if(CheckCollisionRecs(player->hitbox, cenario.chao)) player->jumpTimer = 30;
         player->moves.dirY = -1;
     }
     
